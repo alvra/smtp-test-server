@@ -1,0 +1,30 @@
+[package]
+name = "smtp-test-server"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Alexander van Ratingen"]
+homepage = "https://github.com/alvra/smtp-test-server"
+repository = "https://github.com/alvra/smtp-test-server"
+documentation = "https://docs.rs/smtp-test-server"
+description = "Run a simple SMTP server for testing"
+readme = "README.md"
+keywords = ["smtp", "testing"]
+
+[dependencies]
+tokio = { version = "1.20", features = ["sync", "net", "io-util", "macros", "rt"], default-features = false }
+tokio-stream = "0.1"
+mailparse = "0.13"
+thiserror = "1.0"
+base64ct = { version = "1.5", features = ["alloc"] }
+async-stream = "0.3"
+lettre = { version = "0.10", optional = true, features = ["builder"], default-features = false }
+tracing = { version = "0.1", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1.20", features = ["time"] }
+tokio-test = "0.4"
+lettre = { version = "0.10", features = ["builder", "smtp-transport", "tokio1"], default-features = false }
+
+[package.metadata.docs.rs]
+all-features = true
