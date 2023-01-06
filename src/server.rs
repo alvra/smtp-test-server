@@ -155,6 +155,11 @@ async fn task(
             Ok(Response::Email(email)) => channel.send(Ok(email)).await,
             Ok(Response::Continue) => Ok(()),
             Ok(Response::Quit) => return,
+            Err(Error::Smtp(crate::smtp::Error::Io(e)))
+                if e.kind() == std::io::ErrorKind::BrokenPipe =>
+            {
+                return
+            }
             Err(e) => channel.send(Err(e)).await,
         };
         if let Err(_) = result {
