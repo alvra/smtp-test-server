@@ -26,12 +26,14 @@ pub enum Auth {
     AcceptAll,
 }
 
+#[derive(Debug)]
 pub(crate) enum Response<T> {
     Email(T),
     Continue,
     Quit,
 }
 
+#[derive(Debug)]
 pub(crate) struct Data {
     pub email: Vec<u8>,
     pub address_from: String,
