@@ -40,15 +40,22 @@ pub(crate) struct Data {
     pub address_to: String,
 }
 
+/// Read up to a "/r/n".
 async fn read(
     mut socket: impl tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin,
 ) -> Result<String, Error> {
     let mut buffer = Vec::with_capacity(128 * 1024);
-    let mut len = 0;
-    while len == 0 {
-        len = socket.read_buf(&mut buffer).await?;
+    loop {
+        let len = socket.read_buf(&mut buffer).await?;
+        if len == 0 {
+            let _ = tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+            continue
+        }
+        if !buffer.is_empty() {
+            break
+        }
     }
-    let data = String::from_utf8_lossy(&buffer[..len]).to_string();
+    let data = String::from_utf8_lossy(&buffer).to_string();
     #[cfg(feature = "tracing")]
     {
         use tracing::{event, Level};
