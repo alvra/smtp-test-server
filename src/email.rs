@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 /// An parsed email as received by the server.
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct Email {
     /// The email address of the sender.
     ///
@@ -27,10 +28,6 @@ pub struct Email {
 
     /// The html part of this email.
     pub body_html: String,
-
-    /// This zero-sized field prevents
-    /// creation of this type outside of this crate.
-    _prevent_construction_by_users: (),
 }
 
 impl Email {
@@ -164,6 +161,5 @@ fn convert_email(
             .collect(),
         body_text: part1,
         body_html: part2,
-        _prevent_construction_by_users: (),
     })
 }

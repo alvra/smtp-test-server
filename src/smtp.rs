@@ -2,6 +2,8 @@ use std::net::IpAddr;
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
+const READ_WAIT: std::time::Duration = std::time::Duration::from_millis(10);
+
 /// An error during an SMTP exchange.
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -48,11 +50,11 @@ async fn read(
     loop {
         let len = socket.read_buf(&mut buffer).await?;
         if len == 0 {
-            let _ = tokio::time::sleep(std::time::Duration::from_millis(10)).await;
-            continue
+            let _ = tokio::time::sleep(READ_WAIT).await;
+            continue;
         }
         if !buffer.is_empty() {
-            break
+            break;
         }
     }
     let data = String::from_utf8_lossy(&buffer).to_string();
@@ -186,7 +188,7 @@ pub(crate) async fn receive(
         read_expect(&mut socket, "QUIT\r\n").await?;
         write(&mut socket, "221 Ok\r\n").await?;
 
-        return Ok(Response::Continue);
+        Ok(Response::Continue)
     } else if data.starts_with("MAIL") {
         let address_from = expect_address(data, "MAIL FROM")?;
         write(&mut socket, "250 Ok\r\n").await?;

@@ -108,6 +108,7 @@ impl Server {
         loop {
             match self.try_receive().await {
                 Ok(email) => return email,
+                #[allow(unused_variables)]
                 Err(error) => {
                     #[cfg(feature = "tracing")]
                     {
@@ -162,7 +163,7 @@ async fn task(
             }
             Err(e) => channel.send(Err(e)).await,
         };
-        if let Err(_) = result {
+        if result.is_err() {
             // error sending on channel because it has closed
             // NOTE: just close the socket without sending a smtp `quit`
             return;
@@ -230,11 +231,8 @@ mod tests {
         F: std::future::Future,
         F::Output: std::fmt::Debug,
     {
-        match tokio::time::timeout(TIMEOUT, future).await {
-            Ok(output) => {
-                panic!("expected timeout {op}, unexpected output: {output:?}");
-            }
-            Err(_) => (),
+        if let Ok(output) = tokio::time::timeout(TIMEOUT, future).await {
+            panic!("expected timeout {op}, unexpected output: {output:?}")
         }
     }
 
@@ -429,7 +427,7 @@ mod tests {
         let address = server.address().unwrap();
         let client: SmtpClient = build_client(address).build();
         match run_test_auth_fail(server, client).await {
-            Ok(is_ok) => assert_eq!(is_ok, false),
+            Ok(is_ok) => assert!(!is_ok),
             Err(error) => panic!("unexpected error: {error:?}"),
         }
     }
