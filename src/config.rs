@@ -3,7 +3,7 @@ use std::str::FromStr;
 /// The configuration for a SMTP server.
 ///
 /// This type can be parsed from a string.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Config<T> {
     pub address: T,
     pub port: Option<u16>,
